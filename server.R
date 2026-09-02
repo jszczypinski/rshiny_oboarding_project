@@ -16,10 +16,10 @@ server <- function(input, output, session) {
     )
 
     #  by eventDate directly in DuckDB
-    get_timeline_species_data <- reactive({
+    timeline_species_data <- reactive({
         # Ensures a species is selected before sending a query 
         # Let me know if this is needed.
-        req(input$scientificName, input$scientificName != "")
+        req(input$scientificName)
 
         DBI::dbGetQuery(
             con,
@@ -36,8 +36,8 @@ server <- function(input, output, session) {
     })
 
 
-    get_observation_data <- reactive({
-        req(input$scientificName, nzchar(input$scientificName))
+    observation_data <- reactive({
+        req(input$scientificName)
 
         DBI::dbGetQuery(
             con,
@@ -60,7 +60,7 @@ server <- function(input, output, session) {
 
     # Render Timeline Plot
     output$timeline <- renderPlot({
-        timeline_data <- get_timeline_species_data()
+        timeline_data <- timeline_species_data()
         req(nrow(timeline_data) > 0)
 
         # Ensure Date type in R for ggplot scale
@@ -82,7 +82,7 @@ server <- function(input, output, session) {
 
     # Render Summary Table
     output$yearly_table <- renderTable({
-        timeline_data <- get_timeline_species_data()
+        timeline_data <- timeline_species_data()
         req(nrow(timeline_data) > 0)
 
 
@@ -98,7 +98,7 @@ server <- function(input, output, session) {
     output$poland_map <- renderPlot({
         poland_map <- ne_countries(country = "Poland", returnclass = "sf")
     
-        observation_data <- get_observation_data()
+        observation_data <- observation_data()
         req(nrow(observation_data) > 0)
     
         # convert langitude and latitude vars to sf points layer
