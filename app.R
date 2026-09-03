@@ -12,15 +12,8 @@ con <- dbConnect(
 )
 
 
-# Create species list for the dropdown menu on sidebar
-species_names <- DBI::dbGetQuery(
-    con,
-    "SELECT DISTINCT scientificName
-    FROM occurence_poland
-    WHERE scientificName IS NOT NULL
-    ORDER BY scientificName"
-)$scientificName
-
+source("lib/get_species_names.R")
+source("modules/select_species.R")
 source("ui.R")
 source("server.R")
 
