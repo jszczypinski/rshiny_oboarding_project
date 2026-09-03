@@ -12,8 +12,16 @@ con <- dbConnect(
 )
 
 
+# source all in modules dir
+module_files <- list.files(
+    path = "modules",
+    pattern = "\\.R$",
+    full.names = TRUE,
+    ignore.case = TRUE
+)
+
+invisible(lapply(module_files, source))
 source("lib/get_species_names.R")
-source("modules/select_species.R")
 source("ui.R")
 source("server.R")
 
