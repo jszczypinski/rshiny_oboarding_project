@@ -56,22 +56,22 @@ server <- function(input, output, session) {
 
 
     # Render Timeline Plot
-    timeline_plot_server(
-        id = "timeline_plot",
+    plot_timeline_server(
+        id = "plot_timeline",
         data = timeline_data,
         species = selected_species
     )
 
     # Render Summary Table
-    timeline_table_server(
-        id = "yearly_table",
+    table_timeline_server(
+        id = "table_yearly",
         data = timeline_data,
         species = selected_species
     )
 
     # Redner map of Poland
-    map_plot_server(
-        id = "poland_map",
+    plot_map_server(
+        id = "map_poland",
         data = observation_data,
         species = selected_species
     )

@@ -1,4 +1,4 @@
-timeline_plot_ui <- function(id) {
+plot_timeline_ui <- function(id) {
     ns <- NS(id)
     card(
         card_header("Timeline"),
@@ -6,7 +6,7 @@ timeline_plot_ui <- function(id) {
     )
 }
 
-timeline_plot_server <- function(id, data, species) {
+plot_timeline_server <- function(id, data, species) {
     moduleServer(id, function(input, output, session) {
         output$plot <- renderPlot({
             df <- data()

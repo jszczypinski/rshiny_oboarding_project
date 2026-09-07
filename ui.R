@@ -9,7 +9,7 @@ ui <- page_sidebar(
     layout_columns(
         col_widths = 12,
         min_height = "50vh",
-        map_plot_ui("poland_map")
+        plot_map_ui("map_poland")
     ),
     # 2nd row - plot and a table
     # I am not sure if I usethis kind of plot and table, but the layout should be as it is now
@@ -17,8 +17,8 @@ ui <- page_sidebar(
         col_widths = c(7, 5),
         min_height = "40vh",
         # Timeline card
-        timeline_plot_ui("timeline_plot"),
+        plot_timeline_ui("plot_timeline"),
         # Table card
-        timeline_table_ui("yearly_table")
+        table_timeline_ui("table_yearly")
     )
 )

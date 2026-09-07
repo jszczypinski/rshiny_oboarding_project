@@ -1,4 +1,4 @@
-map_plot_ui <- function(id) {
+plot_map_ui <- function(id) {
     ns <- NS(id)
 
     card(
@@ -7,7 +7,7 @@ map_plot_ui <- function(id) {
     )
 }
 
-map_plot_server <- function(id, data, species){
+plot_map_server <- function(id, data, species){
     moduleServer(id, function(input, output, session){
         output$poland_map <- renderPlot({
             poland_map <- ne_countries(country = "Poland", returnclass = "sf")
@@ -40,7 +40,7 @@ map_plot_server <- function(id, data, species){
                 ) +
                 labs(
                     title = paste("Observation locations:", species()),
-                    subtitle = sprintf("%d records shown", nrow(df))
+                    subtitle = paste(nrow(df), "records shown")
                 ) +
                 theme_minimal(base_size = 11) +
                 theme(

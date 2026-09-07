@@ -1,4 +1,4 @@
-timeline_table_ui <- function(id) {
+table_timeline_ui <- function(id) {
     ns <- NS(id)
     card(
         card_header("Observations per Year"),
@@ -6,7 +6,7 @@ timeline_table_ui <- function(id) {
     )
 }
 
-timeline_table_server <- function(id, data, species) {
+table_timeline_server <- function(id, data, species) {
     moduleServer(id, function(input, output, session) {
         output$table <- renderTable({
             df <- data()
