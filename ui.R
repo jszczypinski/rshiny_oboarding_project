@@ -1,3 +1,18 @@
+# ./ui.R
+
+box::use(
+    bslib[
+        layout_columns,
+        page_sidebar,
+        sidebar
+    ],
+    modules/select_species[select_species_ui],
+    modules/plot_map[plot_map_ui],
+    modules/plot_timeline[plot_timeline_ui],
+    modules/table_timeline[table_timeline_ui]
+)
+
+#' @export
 ui <- page_sidebar(
     title = "Biodiversity dashboard",
     sidebar = sidebar(

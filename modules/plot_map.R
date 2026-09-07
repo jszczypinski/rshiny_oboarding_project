@@ -1,3 +1,39 @@
+# modules/plot_map.R
+
+box::use(
+    shiny[
+        NS,
+        moduleServer,
+        plotOutput,
+        renderPlot,
+        req
+    ],
+    bslib[
+        card,
+        card_header
+    ],
+    rnaturalearth[
+        ne_countries
+    ],
+    sf[
+        st_as_sf,
+        st_crs
+    ],
+    ggplot2[
+        aes,
+        coord_sf,
+        element_blank,
+        element_line,
+        element_text,
+        geom_sf,
+        ggplot,
+        labs,
+        theme,
+        theme_minimal
+    ]
+)
+
+#' @export
 plot_map_ui <- function(id) {
     ns <- NS(id)
 
@@ -7,23 +43,39 @@ plot_map_ui <- function(id) {
     )
 }
 
-plot_map_server <- function(id, data, species){
-    moduleServer(id, function(input, output, session){
+#' Render occurrence locations on a map of Poland
+#'
+#' @param id Shiny module ID.
+#' @param data Reactive expression returning a data frame with `longitude`
+#'   and `latitude` columns.
+#' @param species Reactive expression returning the selected species name.
+#'
+#' @return Registers the module server logic.
+#' @export
+plot_map_server <- function(id, data, species) {
+    moduleServer(id, function(input, output, session) {
         output$poland_map <- renderPlot({
-            poland_map <- ne_countries(country = "Poland", returnclass = "sf")
-        
+            poland_map <- ne_countries(
+                country = "Poland",
+                returnclass = "sf"
+            )
+
             df <- data()
             req(nrow(df) > 0)
-        
-            # convert langitude and latitude vars to sf points layer
+
             sf_points_data <- st_as_sf(
                 df,
                 coords = c("longitude", "latitude"),
                 crs = 4326
             )
-        
+
             ggplot() +
-                geom_sf(data = poland_map, fill = "grey90", color = "grey50", linewidth = 0.3) +
+                geom_sf(
+                    data = poland_map,
+                    fill = "grey90",
+                    color = "grey50",
+                    linewidth = 0.3
+                ) +
                 geom_sf(
                     data = sf_points_data,
                     aes(),

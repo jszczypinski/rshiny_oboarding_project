@@ -1,21 +1,20 @@
-library(shiny)
-library(bslib)
-library(DBI)
-library(duckdb)
-library(here)
-
-source("global.R")
-
-# list all files to source from modules
-module_files <- list.files(
-    path = "modules",
-    pattern = "\\.R$",
-    full.names = TRUE,
-    ignore.case = TRUE
+box::use(
+    shiny[shinyApp],
+    lib/database[create_db_con],
+    app_ui = ./ui,
+    app_server = ./server
 )
-invisible(do.call(lapply, list(module_files, source)))
-source("lib/get_species_names.R")
-source("ui.R")
-source("server.R")
 
-shinyApp(ui, server)
+con <- create_db_con()  # created once, at app startup
+
+shinyApp(
+    ui = app_ui$ui,
+    server = function(input, output, session) {
+        app_server$server(
+            input = input,
+            output = output,
+            session = session,
+            con = con  # passed explicitly into server
+        )
+    }
+)

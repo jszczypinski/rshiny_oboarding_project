@@ -1,75 +1,46 @@
-library(shiny)
-library(rnaturalearth)
-library(rnaturalearthdata)
-library(ggplot2)
-library(sf)
-library(DBI)
+# ./server.R
 
-server <- function(input, output, session) {
-    # Add species options on the server side
+box::use(
+    shiny[reactive, req],
+    modules/select_species[select_species_server],
+    modules/plot_timeline[plot_timeline_server],
+    modules/table_timeline[table_timeline_server],
+    modules/plot_map[plot_map_server],
+    lib/database[
+        db_get_species_names,
+        db_get_timeline_data,
+        db_get_observation_data
+    ]
+)
+
+#' @export
+server <- function(input, output, session, con) {
     selected_species <- select_species_server(
         id = "science_species_selector",
-        species_names = get_species_names(con, "scientificName")
+        species_names = db_get_species_names(con, "scientificName")
     )
 
-    #  by eventDate directly in DuckDB
     timeline_data <- reactive({
-        # Ensures a species is selected before sending a query 
-        # Let me know if this is needed.
         req(selected_species())
-
-        DBI::dbGetQuery(
-            con,
-            "SELECT 
-                CAST(eventDate AS DATE) AS eventDate, 
-                SUM(individualCount) AS individualCount
-             FROM occurence_poland
-             WHERE scientificName = ?
-               AND eventDate IS NOT NULL
-             GROUP BY CAST(eventDate AS DATE)
-             ORDER BY eventDate DESC",
-            params = list(selected_species())
-        )
+        db_get_timeline_data(con, selected_species())
     })
-
 
     observation_data <- reactive({
         req(selected_species())
-
-        DBI::dbGetQuery(
-            con,
-            "
-            SELECT
-                TRY_CAST(latitudeDecimal AS DOUBLE) AS latitude,
-                TRY_CAST(longitudeDecimal AS DOUBLE) AS longitude,
-                scientificName,
-                eventDate,
-                individualCount
-            FROM occurence_poland
-            WHERE scientificName = ?
-            ORDER BY eventDate DESC
-            LIMIT 5000
-            ",
-            params = list(selected_species())
-        )
+        db_get_observation_data(con, selected_species())
     })
 
-
-    # Render Timeline Plot
     plot_timeline_server(
         id = "plot_timeline",
         data = timeline_data,
         species = selected_species
     )
 
-    # Render Summary Table
     table_timeline_server(
         id = "table_yearly",
-        data = timeline_data,
-        species = selected_species
+        data = timeline_data
     )
 
-    # Redner map of Poland
     plot_map_server(
         id = "map_poland",
         data = observation_data,
