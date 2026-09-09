@@ -31,25 +31,19 @@ create_db_con <- function(
 #'
 #' @return Character vector of names.
 #' @export
-db_get_species_names <- function(
-    con,
-    name_col = c("scientificName", "vernacularName")
-) {
-    name_col <- match.arg(name_col)
-
-    query <- sprintf(
+db_get_species_matched <- function(con) {
+    dbGetQuery(
+        con,
         "
-        SELECT DISTINCT %s
+        SELECT DISTINCT
+            scientificName,
+            vernacularName
         FROM occurence_poland
-        WHERE %s IS NOT NULL
-        ORDER BY %s
-        ",
-        DBI::dbQuoteIdentifier(con, name_col),
-        DBI::dbQuoteIdentifier(con, name_col),
-        DBI::dbQuoteIdentifier(con, name_col)
+        WHERE scientificName IS NOT NULL
+          AND vernacularName IS NOT NULL
+        ORDER BY scientificName
+        "
     )
-
-    dbGetQuery(con, query)[[name_col]]
 }
 
 #' Get timeline data for a species

@@ -46,8 +46,7 @@ table_timeline_server <- function(id, data) {
         },
         striped = TRUE,
         hover = TRUE,
-        bordered = TRUE,
-        width = "100%"
+        bordered = TRUE
         )
     })
 }
