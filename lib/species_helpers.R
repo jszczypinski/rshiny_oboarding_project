@@ -11,6 +11,7 @@ box::use(
 #' @param vernacular_names Character vector of vernacular names.
 #' @param preferred_sci Optional preferred scientific name (e.g. "Haliaeetus albicilla").
 #' @return A list with elements `sci` and `vern`, or `NULL` if no valid pair.
+#' @export
 compute_default_species <- function(
     scientific_names,
     vernacular_names,
@@ -66,6 +67,7 @@ compute_default_species <- function(
 #' @param selected_scientific A `reactiveVal` to hold the canonical scientific name.
 #' @param user_interacted A `reactiveVal` (logical) indicating whether the user has interacted with the app.
 #' @return A list with elements `selected_scientific`, `user_interacted`.
+#' @export
 setup_species_selector_sync <- function(
     sci_selector,
     vern_selector,

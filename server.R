@@ -14,10 +14,8 @@ box::use(
     lib/species_helpers[
         compute_default_species,
         setup_species_selector_sync
-    ],
-    stats[setNames]
+    ]
 )
-
 
 #' @export
 server <- function(input, output, session, con) {
