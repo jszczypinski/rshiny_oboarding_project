@@ -78,25 +78,21 @@ setup_species_selector_sync <- function(
     sci_to_vern <- setNames(vernacular_names, scientific_names)
     vern_to_sci <- setNames(scientific_names, vernacular_names)
 
-    # When user changes scientific, update central state
-    observeEvent(sci_selector$selected(), {
-        sci_name <- sci_selector$selected()
-        if (is.null(sci_name) || sci_name == "") return()
-        if (!sci_name %in% names(sci_to_vern)) return()
-
-        user_interacted(TRUE)
-        selected_scientific(sci_name)
-    }, ignoreInit = TRUE)
-
-    # When user changes vernacular, translate and update central state
-    observeEvent(vern_selector$selected(), {
-        vern_name <- vern_selector$selected()
-        if (is.null(vern_name) || vern_name == "") return()
-        if (!vern_name %in% names(vern_to_sci)) return()
-
-        user_interacted(TRUE)
-        selected_scientific(vern_to_sci[[vern_name]])
-    }, ignoreInit = TRUE)
+    # Scientific selector → central state
+    .observe_selection_to_state(
+        selected_reactive = sci_selector$selected,
+        to_sci_lookup = setNames(scientific_names, scientific_names),  # identity map
+        set_selected_scientific = function(x) selected_scientific(x),
+        user_interacted = user_interacted
+    )
+    
+    # Vernacular selector → central state
+    .observe_selection_to_state(
+        selected_reactive = vern_selector$selected,
+        to_sci_lookup = setNames(scientific_names, vernacular_names),
+        set_selected_scientific = function(x) selected_scientific(x),
+        user_interacted = user_interacted
+    )
 
     # When central state changes, update BOTH selectors (but only after user interaction)
     observeEvent(selected_scientific(), {
@@ -129,4 +125,31 @@ setup_species_selector_sync <- function(
         selected_scientific = selected_scientific,
         user_interacted = user_interacted
     ))
+}
+
+#' Internal helper: observe a selector and update central state
+#'
+#' Works for both scientific and vernacular selectors.
+#'
+#' @param selected_reactive A reactive() that returns the current selector value.
+#' @param to_sci_lookup Named vector: selector value -> scientific name.
+#' @param set_selected_scientific Function(value) that updates the central state.
+#' @param user_interacted A reactiveVal (logical) to mark user interaction.
+.observe_selection_to_state <- function(
+    selected_reactive,
+    to_sci_lookup,
+    set_selected_scientific,
+    user_interacted
+) {
+    observeEvent(selected_reactive(), {
+        name <- selected_reactive()
+        if (is.null(name) || name == "") return()
+        if (!name %in% names(to_sci_lookup)) return()
+
+        sci_name <- to_sci_lookup[[name]]
+        if (is.null(sci_name)) return()
+
+        user_interacted(TRUE)
+        set_selected_scientific(sci_name)
+    }, ignoreInit = TRUE)
 }

@@ -78,6 +78,9 @@ select_species_server <- function(
         })
         
         # Expose an update function that always re-supplies choices
+        # I am creating this function so it has access to the module's session object and namespaced ID
+        # server.R then calls set_selected() to update the selector. 
+        # This encapsulates all ui-updating logic within module
         set_selected <- function(value) {
             # Clear first to avoid stale options (selectize.js quirk)
             updateSelectizeInput(
