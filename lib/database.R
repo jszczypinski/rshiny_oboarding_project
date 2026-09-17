@@ -1,5 +1,3 @@
-# database.R
-
 box::use(
     DBI[dbConnect, dbGetQuery, dbQuoteIdentifier],
     duckdb[duckdb],

@@ -1,11 +1,10 @@
-# ./ui.R
-
 box::use(
     bslib[
         layout_columns,
         page_sidebar,
         sidebar
-    ],
+    ])
+box::use(
     modules/select_species[select_species_ui],
     modules/plot_map[plot_map_ui],
     modules/plot_timeline[plot_timeline_ui],
@@ -17,8 +16,7 @@ ui <- page_sidebar(
     title = "Biodiversity dashboard",
     sidebar = sidebar(
         title = "Species selection",
-        select_species_ui("science_species_selector", name_col = "scientificName"),
-        select_species_ui("vernacular_species_selector", name_col = "vernacularName") 
+        select_species_ui("species_selector")
     ),
     
     layout_columns(

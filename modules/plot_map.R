@@ -1,5 +1,3 @@
-# modules/plot_map.R
-
 box::use(
     shiny[
         NS,

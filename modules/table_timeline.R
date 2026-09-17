@@ -1,5 +1,3 @@
-# modules/table_timeline.R
-
 box::use(
     shiny[
         NS,
