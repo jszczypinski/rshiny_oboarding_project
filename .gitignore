@@ -49,4 +49,5 @@ po/*~
 rsconnect/
 
 # data files 
-/data
+/data/raw/
+/data/occurence.duckdb
