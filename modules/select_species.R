@@ -1,3 +1,4 @@
+options(box.path = getwd())
 box::use(
     shiny[
         moduleServer,
@@ -14,7 +15,7 @@ box::use(
     stats[setNames]
     )
 box::use(
-    ../lib/species_helpers[compute_default_species]
+    lib/species_helpers[compute_default_species]
 )
 
 
