@@ -18,7 +18,8 @@ server <- function(input, output, session, con) {
 
     selected_scientific <- select_species_server(
         id = "species_selector",
-        species_matched = db_get_species_matched(con)
+        species_matched = db_get_species_matched(con),
+        preferred_sci = "Haliaeetus albicilla"
     )
   
     # Use scientific selector for data
