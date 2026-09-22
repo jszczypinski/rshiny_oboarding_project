@@ -16,12 +16,9 @@ box::use(
 #' @export
 server <- function(input, output, session, con) {
 
-    # get matched species
-    species_matched <- db_get_species_matched(con)
-
     selected_scientific <- select_species_server(
         id = "species_selector",
-        species_matched = species_matched
+        species_matched = db_get_species_matched(con)
     )
   
     # Use scientific selector for data

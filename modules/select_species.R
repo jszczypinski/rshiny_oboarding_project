@@ -4,7 +4,8 @@ box::use(
         NS,
         reactive,
         reactiveVal,
-        observeEvent,
+        observe,
+        bindEvent,
         req,
         selectizeInput,
         tagList,
@@ -95,7 +96,7 @@ select_species_server <- function(
             )
         )
         # Observe changes in the choices made by users
-        observeEvent(input$scientific_name, {
+        observe({
             sci_name <- input$scientific_name
         
             if (is.null(sci_name) || sci_name == "") {
@@ -107,9 +108,10 @@ select_species_server <- function(
             }
         
             selected_scientific(sci_name)
-        }, ignoreInit = TRUE)
+        }) |>
+            bindEvent(input$scientific_name)
 
-        observeEvent(input$vernacular_name, {
+        observe({
             vern_name <- input$vernacular_name
 
             if (is.null(vern_name) || vern_name == "") {
@@ -120,11 +122,11 @@ select_species_server <- function(
                 return()
             }
             selected_scientific(vern_to_sci[[vern_name]])
-        }, ignoreInit = TRUE)
-        
-        # Update both boxes when central state changes
-        observeEvent(selected_scientific(), {
-            
+        }) |>
+            bindEvent(input$vernacular_name)
+      
+        # Update both boxes when central state changes  
+        observe({
             sci_name <- selected_scientific()
             req(sci_name)
             
@@ -154,7 +156,8 @@ select_species_server <- function(
               )  
             }
 
-        }, ignoreInit = TRUE)
+        }) |>
+          bindEvent(selected_scientific())
 
         reactive(selected_scientific())
     })
