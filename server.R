@@ -1,5 +1,7 @@
+# fmt: skip
 box::use(
     shiny[reactive, req])
+# fmt: skip
 box::use(
     modules/select_species[select_species_server],
     modules/plot_timeline[plot_timeline_server],
@@ -15,13 +17,12 @@ box::use(
 
 #' @export
 server <- function(input, output, session, con) {
-
     selected_scientific <- select_species_server(
         id = "species_selector",
         species_matched = db_get_species_matched(con),
         preferred_sci = "Haliaeetus albicilla"
     )
-  
+
     # Use scientific selector for data
     timeline_data <- reactive({
         specimen <- selected_scientific()

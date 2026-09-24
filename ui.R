@@ -1,9 +1,11 @@
+# fmt: skip
 box::use(
     bslib[
         layout_columns,
         page_sidebar,
         sidebar
     ])
+# fmt: skip
 box::use(
     modules/select_species[select_species_ui],
     modules/plot_map[plot_map_ui],
@@ -18,7 +20,7 @@ ui <- page_sidebar(
         title = "Species selection",
         select_species_ui("species_selector")
     ),
-    
+
     layout_columns(
         col_widths = 12,
         min_height = "50vh",
