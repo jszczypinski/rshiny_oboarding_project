@@ -1,3 +1,4 @@
+# fmt: skip
 box::use(
     shiny[shinyApp],
     lib/database[create_db_con],
@@ -5,7 +6,7 @@ box::use(
     app_server = ./server
 )
 
-con <- create_db_con()  # created once, at app startup
+con <- create_db_con() # created once, at app startup
 
 shinyApp(
     ui = app_ui$ui,
@@ -14,7 +15,7 @@ shinyApp(
             input = input,
             output = output,
             session = session,
-            con = con  # passed explicitly into server
+            con = con # passed explicitly into server
         )
     }
 )

@@ -1,5 +1,3 @@
-#!/usr/bin/env Rscript
-
 library(duckdb)
 library(DBI)
 library(here)
@@ -35,23 +33,23 @@ opt <- parse_args(opt_parser)
 
 # Validate arguments
 
-if(is.null(opt$input)) {
+if (is.null(opt$input)) {
     print_help(opt_parser)
     stop("You must provide --input <path-to-csv>", call = .FALSE)
 }
 
-input_csv  <- opt$input
-output_db  <- opt$output
+input_csv <- opt$input
+output_db <- opt$output
 
 # Connect to DuckDB
 con <- dbConnect(
-  duckdb(),
-  dbdir = output_db,
-  read_only = FALSE
+    duckdb(),
+    dbdir = output_db,
+    read_only = FALSE
 )
 
 # Filter data from Poland only with observed eventDate, scientificName and geo data
-# Will add vernacularName in the future 
+# Will add vernacularName in the future
 DBI::dbExecute(
     con,
     sprintf(
@@ -74,7 +72,7 @@ DBI::dbExecute(
 
 # Select from observations in Poland only those species for which there is a total of >5 observations
 # Just to make it run faster for now.
-# Keep only those species in occurence_poland 
+# Keep only those species in occurence_poland
 DBI::dbExecute(
     con,
     "CREATE OR REPLACE TABLE occurence_poland AS

@@ -1,3 +1,4 @@
+# fmt: skip
 box::use(
     shiny[
         NS,
@@ -32,19 +33,20 @@ table_timeline_ui <- function(id) {
 #' @export
 table_timeline_server <- function(id, data) {
     moduleServer(id, function(input, output, session) {
-        output$table <- renderTable({
-            df <- data()
-            req(nrow(df) > 0)
+        output$table <- renderTable(
+            {
+                df <- data()
+                req(nrow(df) > 0)
 
-            data.frame(
-                Date = as.character(df$eventDate),
-                Observations = as.integer(df$individualCount),
-                check.names = FALSE
-            )
-        },
-        striped = TRUE,
-        hover = TRUE,
-        bordered = TRUE
+                data.frame(
+                    Date = as.character(df$eventDate),
+                    Observations = as.integer(df$individualCount),
+                    check.names = FALSE
+                )
+            },
+            striped = TRUE,
+            hover = TRUE,
+            bordered = TRUE
         )
     })
 }

@@ -1,3 +1,4 @@
+# fmt: skip
 box::use(
     stats[setNames]
 )
