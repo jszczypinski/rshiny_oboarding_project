@@ -1,4 +1,3 @@
-# fmt: skip
 box::use(
     shiny[shinyApp],
     lib/database[create_db_con],

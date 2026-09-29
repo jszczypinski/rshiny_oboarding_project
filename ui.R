@@ -1,11 +1,9 @@
-# fmt: skip
 box::use(
     bslib[
         layout_columns,
         page_sidebar,
         sidebar
     ])
-# fmt: skip
 box::use(
     modules/select_species[select_species_ui],
     modules/plot_map[plot_map_ui],

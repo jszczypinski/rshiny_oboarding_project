@@ -1,7 +1,5 @@
-# fmt: skip
 box::use(
     shiny[reactive, req])
-# fmt: skip
 box::use(
     modules/select_species[select_species_server],
     modules/plot_timeline[plot_timeline_server],

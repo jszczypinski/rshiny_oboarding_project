@@ -1,5 +1,4 @@
 options(box.path = getwd())
-# fmt: skip
 box::use(
     shiny[
         moduleServer,
@@ -16,7 +15,6 @@ box::use(
     ],
     stats[setNames]
     )
-# fmt: skip
 box::use(
     lib/species_helpers[compute_default_species]
 )

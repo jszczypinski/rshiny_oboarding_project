@@ -1,4 +1,3 @@
-# fmt: skip
 box::use(
     shiny[
         NS,
