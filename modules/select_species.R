@@ -14,7 +14,7 @@ box::use(
         showNotification
     ],
     stats[setNames]
-    )
+)
 box::use(
     lib/species_helpers[compute_default_species]
 )

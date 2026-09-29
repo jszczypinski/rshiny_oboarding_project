@@ -1,9 +1,11 @@
 box::use(
-    bslib[
+    bslib
+    [
         layout_columns,
         page_sidebar,
         sidebar
-    ])
+    ]
+)
 box::use(
     modules/select_species[select_species_ui],
     modules/plot_map[plot_map_ui],
