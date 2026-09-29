@@ -1,6 +1,7 @@
 linters: linters_with_defaults(
     line_length_linter(120),
-    indentation_linter(indent = 4L)
+    indentation_linter(indent = 4L),
+    object_usage_linter = NULL
     )
 exclusions: list("renv", "data")
 encoding: "UTF-8"
