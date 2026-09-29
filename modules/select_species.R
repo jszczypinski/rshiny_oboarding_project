@@ -14,7 +14,7 @@ box::use(
         showNotification
     ],
     stats[setNames]
-    )
+)
 box::use(
     lib/species_helpers[compute_default_species]
 )
@@ -24,7 +24,7 @@ box::use(
 #' @export
 select_species_ui <- function(id) {
     ns <- NS(id)
-    
+
     tagList(
         selectizeInput(
             inputId = ns("scientific_name"),
@@ -54,9 +54,8 @@ select_species_server <- function(
     id,
     species_matched,
     preferred_sci
-) { 
+) {
     moduleServer(id, function(input, output, session) {
-
         # Get matched species
         scientific_names <- species_matched$scientificName
         vernacular_names <- species_matched$vernacularName
@@ -68,7 +67,7 @@ select_species_server <- function(
         # set default species
         default_species <- compute_default_species(scientific_names, vernacular_names, preferred_sci)
         default_scientific <- default_species$sci
-        default_vernacular <-  default_species$vern
+        default_vernacular <- default_species$vern
 
         # create a reactive value of default_scientific - a starting choice
         selected_scientific <- reactiveVal(default_scientific)
@@ -101,25 +100,25 @@ select_species_server <- function(
         # Observe changes in the choices made by users
         observe({
             sci_name <- input$scientific_name
-        
+
             if (is.null(sci_name) || sci_name == "") {
                 showNotification(
                     "The scientific name cannot be an empty string!",
                     duration = 10,
                     type = "warning"
-              )
+                )
                 return()
             }
-        
+
             if (!sci_name %in% names(sci_to_vern)) {
                 showNotification(
                     "The scientific name is not present in the database!",
                     duration = 10,
                     type = "warning"
-              )
+                )
                 return()
             }
-        
+
             selected_scientific(sci_name)
         }) |>
             bindEvent(input$scientific_name, ignoreInit = TRUE)
@@ -132,34 +131,34 @@ select_species_server <- function(
                     "The common name cannot be an empty string!",
                     duration = 10,
                     type = "warning"
-              )
+                )
                 return()
             }
 
-            if(!vern_name %in% names(vern_to_sci)) {
+            if (!vern_name %in% names(vern_to_sci)) {
                 showNotification(
                     "The common name is not present in the database",
                     duration = 10,
                     type = "warning"
-              )
+                )
                 return()
             }
             selected_scientific(vern_to_sci[[vern_name]])
         }) |>
             bindEvent(input$vernacular_name, ignoreInit = TRUE)
-      
-        # Update both boxes when central state changes  
+
+        # Update both boxes when central state changes
         observe({
             sci_name <- selected_scientific()
             req(sci_name)
-            
+
             if (!sci_name %in% names(sci_to_vern)) {
                 return()
             }
-            
+
             vern_name <- sci_to_vern[[sci_name]]
 
-            if(!identical(input$scientific_name, sci_name)) {
+            if (!identical(input$scientific_name, sci_name)) {
                 updateSelectizeInput(
                     session = session,
                     inputId = "scientific_name",
@@ -169,18 +168,17 @@ select_species_server <- function(
                 )
             }
 
-            if(!identical(input$vernacular_name, vern_name)) {
-              updateSelectizeInput(
-                session = session,
-                inputId = "vernacular_name",
-                choices = vernacular_names,
-                selected = vern_name,
-                server = TRUE
-              )  
+            if (!identical(input$vernacular_name, vern_name)) {
+                updateSelectizeInput(
+                    session = session,
+                    inputId = "vernacular_name",
+                    choices = vernacular_names,
+                    selected = vern_name,
+                    server = TRUE
+                )
             }
-
         }) |>
-          bindEvent(selected_scientific(), ignoreInit = TRUE)
+            bindEvent(selected_scientific(), ignoreInit = TRUE)
 
         reactive(selected_scientific())
     })
