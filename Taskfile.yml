@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+vars:
+
+tasks:
+  air:
+    desc: Formats root dir based on air.toml
+    cmds:
+      - air format . 
+    silent: true
+  lintr:
+    desc: Lintr root dir 
+    cmds:
+      - Rscript -e 'lintr::lint_dir(".")'
+    silent: true
+

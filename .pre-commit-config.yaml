@@ -2,6 +2,7 @@ default_install_hook_types: [pre-push]
 
 exclude: '^(renv|data)/'
 
+# git push --no-verify skip all hooks
 repos:
   - repo: https://github.com/posit-dev/air-pre-commit
     rev: 0.11.0
