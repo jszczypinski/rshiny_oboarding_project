@@ -73,11 +73,27 @@ DBI::dbExecute(
 # Select from observations in Poland only those species for which there is a total of >5 observations
 # Just to make it run faster for now.
 # Keep only those species in occurence_poland
+# Classify eventDate into astronomical seasons using fixed start dates:
+# spring 21 Mar, summer 21 Jun, autumn 23 Sep, winter 22 Dec
+# (equinoxes/solstices can shift by ~1 day between years)
 DBI::dbExecute(
     con,
     "CREATE OR REPLACE TABLE occurence_poland AS
-    SELECT base.*
-    FROM occurence_poland_base AS base
+    SELECT
+        base.* EXCLUDE (month_day),
+        CASE
+            WHEN month_day IS NULL THEN NULL
+            WHEN month_day >= 1222 OR month_day < 321 THEN 'winter'
+            WHEN month_day < 621 THEN 'spring'
+            WHEN month_day < 923 THEN 'summer'
+            ELSE 'autumn'
+        END AS season
+    FROM (
+        SELECT
+            *,
+            month(TRY_CAST(eventDate AS DATE)) * 100 + day(TRY_CAST(eventDate AS DATE)) AS month_day
+        FROM occurence_poland_base
+    ) AS base
     JOIN (
         SELECT scientificName
         FROM occurence_poland_base

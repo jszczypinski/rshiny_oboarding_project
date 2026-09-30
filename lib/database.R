@@ -68,6 +68,29 @@ db_get_timeline_data <- function(con, species) {
     )
 }
 
+#' Get seasonal data for a species
+#'
+#' @param con DBI connection.
+#' @param species Species name.
+#'
+#' @return Data frame with season and individualCount.
+#' @export
+db_get_season_data <- function(con, species) {
+    dbGetQuery(
+        con,
+        "
+        SELECT
+            season,
+            SUM(individualCount) AS individualCount
+        FROM occurence_poland
+        WHERE scientificName = ?
+          AND season IS NOT NULL
+        GROUP BY season
+        ",
+        params = list(species)
+    )
+}
+
 #' Get observation data for a species
 #'
 #' @param con DBI connection.
