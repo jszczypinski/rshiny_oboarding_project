@@ -102,11 +102,16 @@ select_species_server <- function(
             sci_name <- input$scientific_name
 
             if (is.null(sci_name) || sci_name == "") {
-                showNotification(
-                    "The scientific name cannot be an empty string!",
-                    duration = 10,
-                    type = "warning"
-                )
+                # The box is briefly empty while the sync observer reloads it, so only
+                # warn when the common name is empty too
+                vern_name <- input$vernacular_name
+                if (is.null(vern_name) || vern_name == "") {
+                    showNotification(
+                        "The scientific name cannot be an empty string!",
+                        duration = 10,
+                        type = "warning"
+                    )
+                }
                 return()
             }
 
@@ -127,11 +132,16 @@ select_species_server <- function(
             vern_name <- input$vernacular_name
 
             if (is.null(vern_name) || vern_name == "") {
-                showNotification(
-                    "The common name cannot be an empty string!",
-                    duration = 10,
-                    type = "warning"
-                )
+                # The box is briefly empty while the sync observer reloads it, so only
+                # warn when the scientific name is empty too
+                sci_name <- input$scientific_name
+                if (is.null(sci_name) || sci_name == "") {
+                    showNotification(
+                        "The common name cannot be an empty string!",
+                        duration = 10,
+                        type = "warning"
+                    )
+                }
                 return()
             }
 
