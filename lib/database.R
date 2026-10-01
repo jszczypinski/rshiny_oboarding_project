@@ -6,15 +6,20 @@ box::use(
 
 #' Create DuckDB connection
 #'
-#' @param db_path Path to the DuckDB file.
+#' @param db_path Path to the DuckDB file. Defaults to the `OCCURENCE_DB` environment
+#'   variable, or `data/occurence.duckdb` when it is unset or empty.
 #' @param read_only Logical; open read-only?
 #'
 #' @return DBI connection.
 #' @export
 create_db_con <- function(
-    db_path = here("data", "occurence.duckdb"),
+    db_path = Sys.getenv("OCCURENCE_DB"),
     read_only = TRUE
 ) {
+    if (!nzchar(db_path)) {
+        db_path <- here("data", "occurence.duckdb")
+    }
+
     dbConnect(
         duckdb(),
         dbdir = db_path,

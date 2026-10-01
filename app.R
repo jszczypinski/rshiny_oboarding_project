@@ -1,5 +1,6 @@
 box::use(
-    shiny[shinyApp],
+    shiny[onStop, shinyApp],
+    DBI[dbDisconnect],
     lib/database[create_db_con],
     app_ui = ./ui,
     app_server = ./server
@@ -16,5 +17,8 @@ shinyApp(
             session = session,
             con = con # passed explicitly into server
         )
+    },
+    onStart = function() {
+        onStop(function() dbDisconnect(con, shutdown = TRUE))
     }
 )
