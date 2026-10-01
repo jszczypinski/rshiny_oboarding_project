@@ -40,10 +40,9 @@ db_get_species_matched <- function(con) {
         "
         SELECT DISTINCT
             scientificName,
-            vernacularName
+            COALESCE(vernacularName, 'No common name provided') AS vernacularName
         FROM occurence_poland
         WHERE scientificName IS NOT NULL
-          AND vernacularName IS NOT NULL
         ORDER BY scientificName
         "
     )
