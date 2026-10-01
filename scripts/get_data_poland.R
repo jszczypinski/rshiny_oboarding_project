@@ -48,14 +48,17 @@ con <- dbConnect(
     read_only = FALSE
 )
 
-# Filter data from Poland only with observed eventDate, scientificName and geo data
-# Will add vernacularName in the future
+# Filter data from Poland only with observed eventDate, geo data and at least one species name
+# Records without a scientific name get a placeholder that includes the common name, because the
+# app selects records by scientificName and each such species must stay separate
 DBI::dbExecute(
     con,
     sprintf(
         "
         CREATE OR REPLACE TABLE occurence_poland_base AS
-        SELECT *
+        SELECT * REPLACE (
+            COALESCE(scientificName, 'No scientific name provided (' || vernacularName || ')') AS scientificName
+        )
         FROM read_csv(%s)
         WHERE (
             LOWER(country) IN ('poland')
@@ -64,7 +67,7 @@ DBI::dbExecute(
         AND eventDate IS NOT NULL
         AND latitudeDecimal IS NOT NULL
         AND longitudeDecimal IS NOT NULL
-        AND scientificName IS NOT NULL
+        AND (scientificName IS NOT NULL OR vernacularName IS NOT NULL)
         ",
         dbQuoteString(con, input_csv) # quoted so paths with ' don't break the SQL
     )
