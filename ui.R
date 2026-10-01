@@ -9,7 +9,6 @@ box::use(
 box::use(
     modules/select_species[select_species_ui],
     modules/plot_map[plot_map_ui],
-    modules/plot_timeline[plot_timeline_ui],
     modules/table_timeline[table_timeline_ui],
     modules/plot_season[plot_season_ui]
 )
