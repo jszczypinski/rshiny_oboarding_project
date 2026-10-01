@@ -110,6 +110,9 @@ db_get_observation_data <- function(con, species) {
             individualCount
         FROM occurence_poland
         WHERE scientificName = ?
+          -- sf cannot build points from missing coordinates
+          AND TRY_CAST(latitudeDecimal AS DOUBLE) IS NOT NULL
+          AND TRY_CAST(longitudeDecimal AS DOUBLE) IS NOT NULL
         ORDER BY eventDate DESC
         LIMIT 5000
         ",
