@@ -35,7 +35,7 @@ opt <- parse_args(opt_parser)
 
 if (is.null(opt$input)) {
     print_help(opt_parser)
-    stop("You must provide --input <path-to-csv>", call = .FALSE)
+    stop("You must provide --input <path-to-csv>", call. = FALSE)
 }
 
 input_csv <- opt$input
@@ -56,7 +56,7 @@ DBI::dbExecute(
         "
         CREATE OR REPLACE TABLE occurence_poland_base AS
         SELECT *
-        FROM read_csv('%s')
+        FROM read_csv(%s)
         WHERE (
             LOWER(country) IN ('poland')
             OR countryCode = 'PL'
@@ -66,7 +66,7 @@ DBI::dbExecute(
         AND longitudeDecimal IS NOT NULL
         AND scientificName IS NOT NULL
         ",
-        input_csv
+        dbQuoteString(con, input_csv) # quoted so paths with ' don't break the SQL
     )
 )
 
