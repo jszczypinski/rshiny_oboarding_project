@@ -3,7 +3,6 @@ box::use(
 )
 box::use(
     modules/select_species[select_species_server],
-    modules/plot_timeline[plot_timeline_server],
     modules/table_timeline[table_timeline_server],
     modules/plot_map[plot_map_server],
     modules/plot_season[plot_season_server],
@@ -41,13 +40,6 @@ server <- function(input, output, session, con) {
         req(specimen)
         db_get_season_data(con, specimen)
     })
-
-    # Render modules
-    plot_timeline_server(
-        id = "plot_timeline",
-        data = timeline_data,
-        species = selected_scientific
-    )
 
     table_timeline_server(
         id = "table_yearly",

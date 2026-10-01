@@ -23,15 +23,13 @@ ui <- page_sidebar(
     ),
 
     layout_columns(
-        col_widths = c(8, 4),
         min_height = "50vh",
-        plot_map_ui("map_poland"),
-        plot_season_ui("plot_season")
+        plot_map_ui("map_poland")
     ),
     layout_columns(
         col_widths = c(7, 5),
         min_height = "40vh",
-        plot_timeline_ui("plot_timeline"),
+        plot_season_ui("plot_season"),
         table_timeline_ui("table_yearly")
     )
 )
