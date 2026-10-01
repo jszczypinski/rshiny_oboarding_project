@@ -38,11 +38,24 @@ db_get_species_matched <- function(con) {
     dbGetQuery(
         con,
         "
-        SELECT DISTINCT
+        WITH species AS (
+            -- one row per species: its alphabetically first common name
+            SELECT
+                scientificName,
+                COALESCE(MIN(vernacularName), 'No common name provided') AS vernacularName
+            FROM occurence_poland
+            WHERE scientificName IS NOT NULL
+            GROUP BY scientificName
+        )
+        SELECT
             scientificName,
-            COALESCE(vernacularName, 'No common name provided') AS vernacularName
-        FROM occurence_poland
-        WHERE scientificName IS NOT NULL
+            -- common names shared by several species get the scientific name appended
+            CASE
+                WHEN COUNT(*) OVER (PARTITION BY vernacularName) > 1
+                    THEN vernacularName || ' (' || scientificName || ')'
+                ELSE vernacularName
+            END AS vernacularName
+        FROM species
         ORDER BY scientificName
         "
     )
