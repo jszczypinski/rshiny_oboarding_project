@@ -33,6 +33,7 @@ task lintr   # Rscript -e 'lintr::lint_dir(".")'
 
 - Never commit on `main`. Work on a branch named `feature/<short-desc>` or `bug/<short-desc>`.
 - Never `git push`. The user pushes.
+- Always ask for a permission before you do a commit.
 - Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/):
   `<type>(<optional scope>): <description>`
   - Types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`. Use `fix`, not `bug`.
