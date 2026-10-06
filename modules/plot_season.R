@@ -17,12 +17,22 @@ box::use(
         geom_text,
         ggplot,
         labs,
+        scale_fill_manual,
         theme,
         theme_minimal
     ]
 )
 
 seasons <- c("spring", "summer", "autumn", "winter")
+
+# Pastel season colours, checked so neighbouring bars stay distinguishable,
+# also for protanopia/deuteranopia (OKLab dE >= 15 normal, >= 10 colour-blind)
+season_colors <- c(
+    Spring = "#BFE8B5", # green
+    Summer = "#F59E80", # warm orange-red
+    Autumn = "#9C7C62", # brown
+    Winter = "#A3C9EC" # blue
+)
 
 #' @export
 plot_season_ui <- function(id) {
@@ -58,10 +68,14 @@ plot_season_server <- function(id, data, species) {
                 labels = c("Spring", "Summer", "Autumn", "Winter")
             )
 
-            ggplot(df, aes(x = season, y = individualCount)) +
+            ggplot(df, aes(x = season, y = individualCount, fill = season)) +
                 geom_col(
-                    fill = "#007bc2",
                     width = 0.7
+                ) +
+                # The x-axis already names each bar, so no legend is needed
+                scale_fill_manual(
+                    values = season_colors,
+                    guide = "none"
                 ) +
                 geom_text(
                     aes(label = individualCount),
@@ -71,7 +85,7 @@ plot_season_server <- function(id, data, species) {
                 labs(
                     x = NULL,
                     y = "Number of observations",
-                    title = paste("Seasons for", species())
+                    title = paste("Observations for", species())
                 ) +
                 theme_minimal() +
                 theme(
