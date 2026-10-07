@@ -22,16 +22,11 @@ box::use(
         theme_minimal
     ]
 )
-
-seasons <- c("spring", "summer", "autumn", "winter")
-
-# Pastel season colours, checked so neighbouring bars stay distinguishable,
-# also for protanopia/deuteranopia (OKLab dE >= 15 normal, >= 10 colour-blind)
-season_colors <- c(
-    Spring = "#BFE8B5", # green
-    Summer = "#F59E80", # warm orange-red
-    Autumn = "#9C7C62", # brown
-    Winter = "#A3C9EC" # blue
+box::use(
+    lib/seasons[
+        season_colors,
+        seasons
+    ]
 )
 
 #' @export
