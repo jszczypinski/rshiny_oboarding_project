@@ -124,7 +124,9 @@ db_get_observation_data <- function(con, species) {
             TRY_CAST(longitudeDecimal AS DOUBLE) AS longitude,
             scientificName,
             eventDate,
-            individualCount
+            individualCount,
+            season,
+            locality
         FROM occurence_poland
         WHERE scientificName = ?
           -- sf cannot build points from missing coordinates

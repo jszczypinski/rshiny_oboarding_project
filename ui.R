@@ -8,7 +8,7 @@ box::use(
 )
 box::use(
     modules/select_species[select_species_ui],
-    modules/plot_map[plot_map_ui],
+    modules/plot_leaflet_map[plot_leaflet_map_ui],
     modules/table_timeline[table_timeline_ui],
     modules/plot_season[plot_season_ui]
 )
@@ -23,7 +23,7 @@ ui <- page_sidebar(
 
     layout_columns(
         min_height = "50vh",
-        plot_map_ui("map_poland")
+        plot_leaflet_map_ui("leaflet_map")
     ),
     layout_columns(
         col_widths = c(7, 5),

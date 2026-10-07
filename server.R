@@ -4,7 +4,7 @@ box::use(
 box::use(
     modules/select_species[select_species_server],
     modules/table_timeline[table_timeline_server],
-    modules/plot_map[plot_map_server],
+    modules/plot_leaflet_map[plot_leaflet_map_server],
     modules/plot_season[plot_season_server],
     lib/database[
         db_get_species_matched,
@@ -46,8 +46,8 @@ server <- function(input, output, session, con) {
         data = timeline_data
     )
 
-    plot_map_server(
-        id = "map_poland",
+    plot_leaflet_map_server(
+        id = "leaflet_map",
         data = observation_data,
         species = selected_scientific
     )
