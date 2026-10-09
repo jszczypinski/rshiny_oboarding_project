@@ -110,6 +110,42 @@ db_get_season_data <- function(con, species) {
     )
 }
 
+# Species whose GBIF records have no kingdom, classified by hand
+kingdom_overrides <- c(
+    "Hylocomium splendens" = "Plantae" # moss; record has only the family HYLOCOMIACEAE
+)
+
+#' Get a one-row summary of a species for the value boxes
+#'
+#' A missing kingdom is filled in from `kingdom_overrides` when the species is listed there.
+#'
+#' @param con DBI connection.
+#' @param species Species name.
+#'
+#' @return Data frame with kingdom, vernacularName, records and individuals.
+#' @export
+db_get_species_summary <- function(con, species) {
+    summary <- dbGetQuery(
+        con,
+        "
+        SELECT
+            MIN(kingdom) AS kingdom,
+            -- same rule as the species selector
+            COALESCE(MIN(vernacularName), 'No common name provided') AS vernacularName,
+            COUNT(*) AS records,
+            SUM(individualCount) AS individuals
+        FROM occurence_poland
+        WHERE scientificName = ?
+        ",
+        params = list(species)
+    )
+
+    if (is.na(summary$kingdom) && species %in% names(kingdom_overrides)) {
+        summary$kingdom <- kingdom_overrides[[species]]
+    }
+    summary
+}
+
 #' Get observation data for a species
 #'
 #' @param con DBI connection.

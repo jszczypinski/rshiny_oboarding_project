@@ -6,11 +6,13 @@ box::use(
     modules/table_timeline[table_timeline_server],
     modules/plot_leaflet_map[plot_leaflet_map_server],
     modules/plot_season[plot_season_server],
+    modules/value_boxes[value_boxes_server],
     lib/database[
         db_get_species_matched,
         db_get_timeline_data,
         db_get_observation_data,
-        db_get_season_data
+        db_get_season_data,
+        db_get_species_summary
     ]
 )
 
@@ -40,6 +42,18 @@ server <- function(input, output, session, con) {
         req(specimen)
         db_get_season_data(con, specimen)
     })
+
+    species_summary <- reactive({
+        specimen <- selected_scientific()
+        req(specimen)
+        db_get_species_summary(con, specimen)
+    })
+
+    value_boxes_server(
+        id = "value_boxes",
+        data = species_summary,
+        species = selected_scientific
+    )
 
     table_timeline_server(
         id = "table_yearly",

@@ -10,7 +10,8 @@ box::use(
     modules/select_species[select_species_ui],
     modules/plot_leaflet_map[plot_leaflet_map_ui],
     modules/table_timeline[table_timeline_ui],
-    modules/plot_season[plot_season_ui]
+    modules/plot_season[plot_season_ui],
+    modules/value_boxes[value_boxes_ui]
 )
 
 #' @export
@@ -21,6 +22,7 @@ ui <- page_sidebar(
         select_species_ui("species_selector")
     ),
 
+    value_boxes_ui("value_boxes"),
     layout_columns(
         min_height = "50vh",
         plot_leaflet_map_ui("leaflet_map")
