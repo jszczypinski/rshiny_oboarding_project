@@ -80,7 +80,7 @@ plot_season_server <- function(id, data, species) {
                 labs(
                     x = NULL,
                     y = "Number of observations",
-                    title = paste("Observations for", species())
+                    title = NULL
                 ) +
                 theme_minimal() +
                 theme(
