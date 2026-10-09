@@ -66,7 +66,7 @@ db_get_species_matched <- function(con) {
 #' @param con DBI connection.
 #' @param species Species name.
 #'
-#' @return Data frame with eventDate and individualCount.
+#' @return Data frame with eventDate, season and individualCount.
 #' @export
 db_get_timeline_data <- function(con, species) {
     dbGetQuery(
@@ -74,11 +74,13 @@ db_get_timeline_data <- function(con, species) {
         "
         SELECT
             CAST(eventDate AS DATE) AS eventDate,
+            -- season follows from the date, so grouping by it adds no extra rows
+            season,
             SUM(individualCount) AS individualCount
         FROM occurence_poland
         WHERE scientificName = ?
           AND eventDate IS NOT NULL
-        GROUP BY CAST(eventDate AS DATE)
+        GROUP BY CAST(eventDate AS DATE), season
         ORDER BY eventDate DESC
         ",
         params = list(species)
@@ -129,7 +131,7 @@ db_get_observation_data <- function(con, species) {
             locality
         FROM occurence_poland
         WHERE scientificName = ?
-          -- sf cannot build points from missing coordinates
+          -- leaflet cannot build points from missing coordinates
           AND TRY_CAST(latitudeDecimal AS DOUBLE) IS NOT NULL
           AND TRY_CAST(longitudeDecimal AS DOUBLE) IS NOT NULL
         ORDER BY eventDate DESC

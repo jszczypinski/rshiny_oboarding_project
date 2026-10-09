@@ -2,15 +2,34 @@ box::use(
     shiny[
         NS,
         moduleServer,
-        renderTable,
-        req,
-        tableOutput
+        req
     ],
     bslib[
         card,
         card_header
+    ],
+    reactable[
+        reactable,
+        renderReactable,
+        reactableOutput,
+        colDef
+    ],
+    grDevices[
+        adjustcolor
+    ],
+    stats[
+        setNames
     ]
 )
+box::use(
+    lib/seasons[
+        season_colors,
+        seasons
+    ]
+)
+
+# Light tints of the season colours (40% strength on the white card) keep the text easy to read
+season_tints <- setNames(adjustcolor(season_colors, alpha.f = 0.4), seasons)
 
 #' @export
 table_timeline_ui <- function(id) {
@@ -18,7 +37,7 @@ table_timeline_ui <- function(id) {
 
     card(
         card_header("Observations per Year"),
-        tableOutput(ns("table"))
+        reactableOutput(ns("table"))
     )
 }
 
@@ -32,20 +51,33 @@ table_timeline_ui <- function(id) {
 #' @export
 table_timeline_server <- function(id, data) {
     moduleServer(id, function(input, output, session) {
-        output$table <- renderTable(
+        output$table <- renderReactable(
             {
                 df <- data()
                 req(nrow(df) > 0)
 
-                data.frame(
-                    Date = as.character(df$eventDate),
-                    Observations = as.integer(df$individualCount),
-                    check.names = FALSE
+                reactable(
+                    data = df,
+                    columns = list(
+                        eventDate = colDef(name = "Date", filterable = TRUE, sortable = TRUE),
+                        # only used for the row colour
+                        season = colDef(show = FALSE),
+                        individualCount = colDef(
+                            name = "Observations",
+                            sortable = TRUE
+                        )
+                    ),
+                    # tint each row with its season colour; rows without a season stay white
+                    rowStyle = function(index) {
+                        season <- df$season[index]
+                        if (is.na(season)) {
+                            return(NULL)
+                        }
+                        list(background = season_tints[[season]])
+                    },
+                    pagination = FALSE
                 )
-            },
-            striped = TRUE,
-            hover = TRUE,
-            bordered = TRUE
+            }
         )
     })
 }
