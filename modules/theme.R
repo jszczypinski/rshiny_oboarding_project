@@ -1,3 +1,12 @@
+box::use(
+    grDevices[
+        adjustcolor
+    ],
+    stats[
+        setNames
+    ]
+)
+
 #' Pastel season colours named vector
 #'
 #' Checked so neighbouring seasons stay distinguishable, also for
@@ -9,3 +18,9 @@ SEASON_COLORS <- c(
     autumn = "#9C7C62",
     winter = "#A3C9EC"
 )
+
+
+#' Pastel season colours tinted for table display
+#'
+#' @export
+SEASON_TINTS <- setNames(adjustcolor(SEASON_COLORS, alpha.f = 0.4), names(SEASON_COLORS))
