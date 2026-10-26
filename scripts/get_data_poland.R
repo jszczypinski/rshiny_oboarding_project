@@ -57,7 +57,11 @@ DBI::dbExecute(
         "
         CREATE OR REPLACE TABLE occurence_poland_base AS
         SELECT * REPLACE (
-            COALESCE(scientificName, 'No scientific name provided (' || vernacularName || ')') AS scientificName
+            COALESCE(scientificName, 'No scientific name provided (' || vernacularName || ')') AS scientificName,
+            CASE
+                WHEN kingdom IS NULL AND scientificName = 'Hylocomium splendens' THEN 'Plantae'
+                ELSE kingdom
+            END AS kingdom
         )
         FROM read_csv(%s)
         WHERE (
@@ -73,12 +77,12 @@ DBI::dbExecute(
     )
 )
 
-# Select from observations in Poland only those species for which there is a total of >5 observations
+# Select from observations in Poland only those species for which there is a total of >5 individuals recorded
 # Just to make it run faster for now.
 # Keep only those species in occurence_poland
 # Classify eventDate into astronomical seasons using fixed start dates:
 # spring 21 Mar, summer 21 Jun, autumn 23 Sep, winter 22 Dec
-# (equinoxes/solstices can shift by ~1 day between years)
+# Assings
 DBI::dbExecute(
     con,
     "CREATE OR REPLACE TABLE occurence_poland AS

@@ -13,13 +13,9 @@ box::use(
 #' @return DBI connection.
 #' @export
 create_db_con <- function(
-    db_path = Sys.getenv("OCCURENCE_DB"),
+    db_path = Sys.getenv("OCCURENCE_DB", here("data", "occurence.duckdb")),
     read_only = TRUE
 ) {
-    if (!nzchar(db_path)) {
-        db_path <- here("data", "occurence.duckdb")
-    }
-
     dbConnect(
         duckdb(),
         dbdir = db_path,
@@ -39,9 +35,9 @@ db_get_species_matched <- function(con) {
         con,
         "
         WITH species AS (
-            -- one row per species: its alphabetically first common name
             SELECT
                 scientificName,
+                -- Some scientific names in the database do not have a common name provided
                 COALESCE(MIN(vernacularName), 'No common name provided') AS vernacularName
             FROM occurence_poland
             WHERE scientificName IS NOT NULL
@@ -49,7 +45,7 @@ db_get_species_matched <- function(con) {
         )
         SELECT
             scientificName,
-            -- common names shared by several species get the scientific name appended
+            -- Some common names in the database are shared by several scientific names 
             CASE
                 WHEN COUNT(*) OVER (PARTITION BY vernacularName) > 1
                     THEN vernacularName || ' (' || scientificName || ')'
@@ -74,7 +70,6 @@ db_get_timeline_data <- function(con, species) {
         "
         SELECT
             CAST(eventDate AS DATE) AS eventDate,
-            -- season follows from the date, so grouping by it adds no extra rows
             season,
             SUM(individualCount) AS individualCount
         FROM occurence_poland
@@ -110,14 +105,7 @@ db_get_season_data <- function(con, species) {
     )
 }
 
-# Species whose GBIF records have no kingdom, classified by hand
-kingdom_overrides <- c(
-    "Hylocomium splendens" = "Plantae" # moss; record has only the family HYLOCOMIACEAE
-)
-
 #' Get a one-row summary of a species for the value boxes
-#'
-#' A missing kingdom is filled in from `kingdom_overrides` when the species is listed there.
 #'
 #' @param con DBI connection.
 #' @param species Species name.
@@ -130,7 +118,6 @@ db_get_species_summary <- function(con, species) {
         "
         SELECT
             MIN(kingdom) AS kingdom,
-            -- same rule as the species selector
             COALESCE(MIN(vernacularName), 'No common name provided') AS vernacularName,
             COUNT(*) AS records,
             SUM(individualCount) AS individuals
@@ -139,11 +126,6 @@ db_get_species_summary <- function(con, species) {
         ",
         params = list(species)
     )
-
-    if (is.na(summary$kingdom) && species %in% names(kingdom_overrides)) {
-        summary$kingdom <- kingdom_overrides[[species]]
-    }
-    summary
 }
 
 #' Get observation data for a species
