@@ -10,6 +10,12 @@ box::use(
         card,
         card_header
     ],
+    dplyr[
+        full_join,
+        if_else,
+        mutate,
+        tibble
+    ],
     ggplot2[
         aes,
         element_blank,
@@ -18,14 +24,17 @@ box::use(
         ggplot,
         labs,
         scale_fill_manual,
+        scale_x_discrete,
         theme,
         theme_minimal
+    ],
+    tools[
+        toTitleCase
     ]
 )
 box::use(
-    lib/seasons[
-        season_colors,
-        seasons
+    modules/theme[
+        SEASON_COLORS
     ]
 )
 
@@ -54,23 +63,27 @@ plot_season_server <- function(id, data, species) {
             df <- data()
             req(nrow(df) > 0)
 
-            # Show every season, including those without observations
-            df <- merge(data.frame(season = seasons), df, all.x = TRUE)
-            df$individualCount[is.na(df$individualCount)] <- 0
-            df$season <- factor(
-                df$season,
-                levels = seasons,
-                labels = c("Spring", "Summer", "Autumn", "Winter")
-            )
+            df <- df |>
+                full_join(tibble(season = names(SEASON_COLORS)), by = "season") |>
+                mutate(
+                    individualCount = if_else(
+                        is.na(individualCount),
+                        0,
+                        individualCount
+                    ),
+                    season = factor(season, levels = names(SEASON_COLORS))
+                )
 
             ggplot(df, aes(x = season, y = individualCount, fill = season)) +
                 geom_col(
                     width = 0.7
                 ) +
-                # The x-axis already names each bar, so no legend is needed
                 scale_fill_manual(
-                    values = season_colors,
+                    values = SEASON_COLORS,
                     guide = "none"
+                ) +
+                scale_x_discrete(
+                    labels = toTitleCase(names(SEASON_COLORS))
                 ) +
                 geom_text(
                     aes(label = individualCount),

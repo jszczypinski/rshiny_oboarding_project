@@ -22,14 +22,13 @@ box::use(
     ]
 )
 box::use(
-    lib/seasons[
-        season_colors,
-        seasons
+    modules/theme[
+        SEASON_COLORS
     ]
 )
 
 # Light tints of the season colours (40% strength on the white card) keep the text easy to read
-season_tints <- setNames(adjustcolor(season_colors, alpha.f = 0.4), seasons)
+SEASON_TINTS <- setNames(adjustcolor(SEASON_COLORS, alpha.f = 0.4), names(SEASON_COLORS))
 
 #' @export
 table_timeline_ui <- function(id) {
@@ -73,7 +72,7 @@ table_timeline_server <- function(id, data) {
                         if (is.na(season)) {
                             return(NULL)
                         }
-                        list(background = season_tints[[season]])
+                        list(background = SEASON_TINTS[[season]])
                     },
                     pagination = FALSE
                 )
