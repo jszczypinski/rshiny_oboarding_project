@@ -3,8 +3,13 @@ box::use(
         card,
         card_header
     ],
+    dplyr[
+        coalesce
+    ],
     htmltools[
-        htmlEscape
+        doRenderTags,
+        tagList,
+        tags
     ],
     leaflet[
         addCircleMarkers,
@@ -19,28 +24,32 @@ box::use(
         providers,
         renderLeaflet
     ],
+    purrr[
+        pmap_chr
+    ],
     shiny[
         NS,
         moduleServer,
         req
-    ]
-)
-box::use(
-    lib/seasons[
-        season_colors,
-        seasons
+    ],
+    tools[
+        toTitleCase
     ]
 )
 
-# Same colours as the season plot; records without a season are grey
-season_palette <- colorFactor(
-    palette = unname(season_colors),
-    levels = seasons,
+box::use(
+    modules/theme[
+        SEASON_COLORS
+    ]
+)
+# Poland's bounding box (south-west and north-east corners), used as the fixed map view
+POLAND_BOUNDS <- list(lng1 = 14.1, lat1 = 49.0, lng2 = 24.2, lat2 = 54.9)
+
+SEASON_PALETTE <- colorFactor(
+    palette = unname(SEASON_COLORS),
+    levels = names(SEASON_COLORS),
     na.color = "#BDBDBD"
 )
-
-# Poland's bounding box (south-west and north-east corners), used as the fixed map view
-poland_bounds <- list(lng1 = 14.1, lat1 = 49.0, lng2 = 24.2, lat2 = 54.9)
 
 #' @export
 plot_leaflet_map_ui <- function(id) {
@@ -71,35 +80,41 @@ plot_leaflet_map_server <- function(id, data, species) {
             req(nrow(df) > 0)
 
             individuals <- ifelse(is.na(df$individualCount), 1, df$individualCount)
-            popups <- paste0(
-                "<b>",
-                htmlEscape(species()),
-                "</b><br>",
-                "Date: ",
-                htmlEscape(format(df$eventDate)),
-                "<br>",
-                "Season: ",
-                htmlEscape(ifelse(is.na(df$season), "unknown", df$season)),
-                "<br>",
-                "Individuals: ",
-                individuals,
-                "<br>",
-                "Locality: ",
-                htmlEscape(ifelse(is.na(df$locality), "unknown", df$locality))
+            popups <- pmap_chr(
+                list(
+                    date = format(df$eventDate),
+                    season = coalesce(df$season, "unknown"),
+                    count = individuals,
+                    locality = coalesce(df$locality, "unknown")
+                ),
+                function(date, season, count, locality) {
+                    as.character(doRenderTags(tagList(
+                        tags$b(species()),
+                        tags$br(),
+                        "Date: ",
+                        date,
+                        tags$br(),
+                        "Season: ",
+                        season,
+                        tags$br(),
+                        "Individuals: ",
+                        count,
+                        tags$br(),
+                        "Locality: ",
+                        locality
+                    )))
+                }
             )
 
-            # zoomSnap 0.25 allows in-between zoom levels, so Poland fills the card snugly
             leaflet(df, options = leafletOptions(zoomSnap = 0.25)) |>
-                # Light grey basemap that needs no API key (CartoDB now watermarks tiles without one)
+                # Using light grey basemap because it needs no API key)
                 addProviderTiles(providers$Esri.WorldGrayCanvas) |>
                 addCircleMarkers(
-                    lng = ~longitude,
-                    lat = ~latitude,
-                    # sqrt keeps a flock of 76 visible without hiding single observations
+                    lng = ~ as.numeric(longitude),
+                    lat = ~ as.numeric(latitude),
                     radius = 4 + 2 * sqrt(individuals),
-                    fillColor = ~ season_palette(season),
+                    fillColor = ~ SEASON_PALETTE(season),
                     fillOpacity = 0.85,
-                    # dark outline keeps the pastel fills visible on the light tiles
                     color = "#4D4D4D",
                     weight = 1,
                     opacity = 0.9,
@@ -107,21 +122,23 @@ plot_leaflet_map_server <- function(id, data, species) {
                 ) |>
                 addLegend(
                     position = "bottomright",
-                    colors = unname(season_colors),
-                    labels = names(season_colors),
+                    colors = unname(SEASON_COLORS),
+                    labels = toTitleCase(names(SEASON_COLORS)),
                     title = "Season",
                     opacity = 0.85
                 ) |>
                 addControl(
-                    html = paste(nrow(df), "records shown"),
+                    html = paste(
+                        sum(!is.na(as.numeric(df$longitude)) & !is.na(as.numeric(df$latitude))),
+                        "records shown"
+                    ),
                     position = "topright"
                 ) |>
-                # Always show the whole of Poland (its bounding box), whatever the card size
                 fitBounds(
-                    lng1 = poland_bounds$lng1,
-                    lat1 = poland_bounds$lat1,
-                    lng2 = poland_bounds$lng2,
-                    lat2 = poland_bounds$lat2
+                    lng1 = POLAND_BOUNDS$lng1,
+                    lat1 = POLAND_BOUNDS$lat1,
+                    lng2 = POLAND_BOUNDS$lng2,
+                    lat2 = POLAND_BOUNDS$lat2
                 )
         })
     })

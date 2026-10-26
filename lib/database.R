@@ -140,8 +140,8 @@ db_get_observation_data <- function(con, species) {
         con,
         "
         SELECT
-            TRY_CAST(latitudeDecimal AS DOUBLE) AS latitude,
-            TRY_CAST(longitudeDecimal AS DOUBLE) AS longitude,
+            latitudeDecimal AS latitude,
+            longitudeDecimal AS longitude,
             scientificName,
             eventDate,
             individualCount,
@@ -149,9 +149,6 @@ db_get_observation_data <- function(con, species) {
             locality
         FROM occurence_poland
         WHERE scientificName = ?
-          -- leaflet cannot build points from missing coordinates
-          AND TRY_CAST(latitudeDecimal AS DOUBLE) IS NOT NULL
-          AND TRY_CAST(longitudeDecimal AS DOUBLE) IS NOT NULL
         ORDER BY eventDate DESC
         LIMIT 5000
         ",
