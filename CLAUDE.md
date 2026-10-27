@@ -21,7 +21,7 @@ Enforced by `air.toml` and `.lintr`:
   - Multi-line `box::use` blocks list one import per line. air skips `use` calls (`skip = ["use"]`), so format them by hand.
 - Export module/lib functions with `#' @export` and document them with roxygen `#'` comments (`@param`, `@return`).
 - `renv/` and `data/` are excluded from formatting and linting.
-
+- Comments should explain the "why" behind the logic instead of explaining what the code does. Never explain what the code does in the comment.
 Checks (also run by the pre-push hook):
 
 ```bash
