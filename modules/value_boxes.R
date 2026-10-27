@@ -10,6 +10,9 @@ box::use(
         tagList,
         tags
     ],
+    sass[
+        sass
+    ],
     shiny[
         NS,
         moduleServer,
@@ -21,46 +24,47 @@ box::use(
     ]
 )
 
-icon_height <- "1.75rem"
+ICON_HEIGHT <- "1.75rem"
 
-# bslib's default value box padding (1.5rem) makes the boxes tall; tighten it for these boxes only
-compact_css <- "
-.value-box-compact .value-box-area { padding: 0.5rem 1rem; }
-.value-box-compact .value-box-showcase { padding: 0.5rem 1rem; }
-.value-box-compact .value-box-title,
-.value-box-compact .value-box-value { margin-bottom: 0; }
-.value-box-compact .value-box-value { font-size: 1.25rem; line-height: 1.3; }
+# bslib's default value box padding (1.5rem) makes the boxes too tall;
+# tighten it for these boxes only
+BOX_VARS <- list(
+    box_padding = "0.5rem 1rem",
+    box_value_size = "1.25rem"
+)
+
+BOX_RULE <- "
+    .value-box-compact {
+        .value-box-area,
+        .value-box-showcase {
+            padding: $box_padding;
+        }
+        .value-box-title,
+        .value-box-value {
+            margin-bottom: 0;
+        }
+        .value-box-value {
+            font-size: $box_value_size;
+            line-height: 1.3;
+        }
+    }
 "
 
-#' Pick the showcase icon for a kingdom
-#'
-#' @param kingdom Kingdom name (e.g. "Animalia", "Plantae"), may be `NA`.
-#' @return A fontawesome icon.
-kingdom_icon <- function(kingdom) {
-    if (is.na(kingdom)) {
-        return(fa("circle-question", height = icon_height, title = "Unknown kingdom"))
-    }
-    switch(
-        kingdom,
-        Animalia = fa("paw", height = icon_height, title = "Animal"),
-        Plantae = fa("seedling", height = icon_height, title = "Plant"),
-        fa("circle-question", height = icon_height, title = kingdom)
-    )
-}
+COMPACT_CSS <- sass(input = list(BOX_VARS, BOX_RULE))
 
 #' @export
 value_boxes_ui <- function(id) {
     ns <- NS(id)
 
     tagList(
-        tags$style(compact_css),
+        tags$style(COMPACT_CSS),
         layout_columns(
             col_widths = c(6, 6),
             fill = FALSE,
             value_box(
                 title = NULL,
                 value = uiOutput(ns("names")),
-                showcase = uiOutput(ns("kingdom_icon")),
+                showcase = uiOutput(ns(".get_kingdom_icon")),
                 class = "value-box-compact"
             ),
             value_box(
@@ -71,7 +75,7 @@ value_boxes_ui <- function(id) {
                     textOutput(ns("individuals"), inline = TRUE),
                     tags$span(class = "fs-6 fw-normal", textOutput(ns("records"), inline = TRUE))
                 ),
-                showcase = fa("binoculars", height = icon_height, title = "Observations"),
+                showcase = fa("binoculars", height = ICON_HEIGHT, title = "Observations"),
                 class = "value-box-compact"
             )
         )
@@ -89,18 +93,17 @@ value_boxes_ui <- function(id) {
 #' @export
 value_boxes_server <- function(id, data, species) {
     moduleServer(id, function(input, output, session) {
-        output$kingdom_icon <- renderUI({
+        output$.get_kingdom_icon <- renderUI({
             kingdom <- data()$kingdom
             req(length(kingdom) == 1)
 
-            kingdom_icon(kingdom)
+            .get_kingdom_icon(kingdom)
         })
 
         output$names <- renderUI({
             df <- data()
             req(nrow(df) == 1)
 
-            # similar sizes for both names (fs-5 vs fs-6) instead of the large default value font
             tags$div(
                 tags$em(class = "fs-5", species()),
                 tags$br(),
@@ -123,4 +126,21 @@ value_boxes_server <- function(id, data, species) {
             paste("in", format(df$records, big.mark = " "), if (df$records == 1) "record" else "records")
         })
     })
+}
+
+
+#' A helper function to pick the showcase icon for a kingdom
+#'
+#' @param kingdom Kingdom name (e.g. "Animalia", "Plantae"), may be `NA`.
+#' @return A fontawesome icon.
+.get_kingdom_icon <- function(kingdom) {
+    if (is.na(kingdom)) {
+        return(fa("circle-question", height = ICON_HEIGHT, title = "Unknown kingdom"))
+    }
+    switch(
+        kingdom,
+        Animalia = fa("paw", height = ICON_HEIGHT, title = "Animal"),
+        Plantae = fa("seedling", height = ICON_HEIGHT, title = "Plant"),
+        fa("circle-question", height = ICON_HEIGHT, title = kingdom)
+    )
 }
