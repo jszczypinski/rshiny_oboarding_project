@@ -62,7 +62,6 @@ table_timeline_server <- function(id, data) {
                             sortable = TRUE
                         )
                     ),
-                    # tint each row with its season colour; rows without a season stay white
                     rowStyle = function(index) {
                         season <- df$season[index]
                         if (is.na(season)) {

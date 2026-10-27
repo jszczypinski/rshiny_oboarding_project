@@ -56,23 +56,18 @@ select_species_server <- function(
     preferred_sci
 ) {
     moduleServer(id, function(input, output, session) {
-        # Get matched species
         scientific_names <- species_matched$scientificName
         vernacular_names <- species_matched$vernacularName
 
-        # Get character vectors with matched species
         sci_to_vern <- setNames(vernacular_names, scientific_names)
         vern_to_sci <- setNames(scientific_names, vernacular_names)
 
-        # set default species
         default_species <- compute_default_species(scientific_names, vernacular_names, preferred_sci)
         default_scientific <- default_species$sci
         default_vernacular <- default_species$vern
 
-        # create a reactive value of default_scientific - a starting choice
         selected_scientific <- reactiveVal(default_scientific)
 
-        # Initialize selectize input
         updateSelectizeInput(
             session,
             inputId = "scientific_name",
@@ -85,7 +80,6 @@ select_species_server <- function(
             )
         )
 
-        # Initialize selectize input
         updateSelectizeInput(
             session,
             inputId = "vernacular_name",
@@ -97,7 +91,6 @@ select_species_server <- function(
                 maxOptions = 1000
             )
         )
-        # Observe changes in the choices made by users
         observe({
             sci_name <- input$scientific_name
 
@@ -105,6 +98,7 @@ select_species_server <- function(
                 # The box is briefly empty while the sync observer reloads it, so only
                 # warn when the common name is empty too
                 vern_name <- input$vernacular_name
+
                 if (is.null(vern_name) || vern_name == "") {
                     showNotification(
                         "The scientific name cannot be an empty string!",
@@ -135,6 +129,7 @@ select_species_server <- function(
                 # The box is briefly empty while the sync observer reloads it, so only
                 # warn when the scientific name is empty too
                 sci_name <- input$scientific_name
+
                 if (is.null(sci_name) || sci_name == "") {
                     showNotification(
                         "The common name cannot be an empty string!",
@@ -157,7 +152,6 @@ select_species_server <- function(
         }) |>
             bindEvent(input$vernacular_name, ignoreInit = TRUE)
 
-        # Update both boxes when central state changes
         observe({
             sci_name <- selected_scientific()
             req(sci_name)
