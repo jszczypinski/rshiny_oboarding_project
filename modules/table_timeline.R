@@ -2,23 +2,37 @@ box::use(
     shiny[
         NS,
         moduleServer,
-        renderTable,
-        req,
-        tableOutput
+        req
     ],
     bslib[
         card,
         card_header
+    ],
+    reactable[
+        reactable,
+        renderReactable,
+        reactableOutput,
+        colDef
+    ],
+    grDevices[
+        adjustcolor
+    ],
+    stats[
+        setNames
     ]
 )
-
+box::use(
+    modules/theme[
+        SEASON_TINTS
+    ]
+)
 #' @export
 table_timeline_ui <- function(id) {
     ns <- NS(id)
 
     card(
         card_header("Observations per Year"),
-        tableOutput(ns("table"))
+        reactableOutput(ns("table"))
     )
 }
 
@@ -32,20 +46,32 @@ table_timeline_ui <- function(id) {
 #' @export
 table_timeline_server <- function(id, data) {
     moduleServer(id, function(input, output, session) {
-        output$table <- renderTable(
+        output$table <- renderReactable(
             {
                 df <- data()
                 req(nrow(df) > 0)
 
-                data.frame(
-                    Date = as.character(df$eventDate),
-                    Observations = as.integer(df$individualCount),
-                    check.names = FALSE
+                reactable(
+                    data = df,
+                    columns = list(
+                        eventDate = colDef(name = "Date", filterable = TRUE, sortable = TRUE),
+                        # only used for the row colour
+                        season = colDef(show = FALSE),
+                        individualCount = colDef(
+                            name = "Observations",
+                            sortable = TRUE
+                        )
+                    ),
+                    rowStyle = function(index) {
+                        season <- df$season[index]
+                        if (is.na(season)) {
+                            return(NULL)
+                        }
+                        list(background = SEASON_TINTS[[season]])
+                    },
+                    pagination = FALSE
                 )
-            },
-            striped = TRUE,
-            hover = TRUE,
-            bordered = TRUE
+            }
         )
     })
 }

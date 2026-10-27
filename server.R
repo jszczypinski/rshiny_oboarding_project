@@ -3,15 +3,17 @@ box::use(
 )
 box::use(
     modules/select_species[select_species_server],
-    modules/plot_timeline[plot_timeline_server],
     modules/table_timeline[table_timeline_server],
-    modules/plot_map[plot_map_server],
+    modules/plot_leaflet_map[plot_leaflet_map_server],
+    modules/plot_season[plot_season_server],
+    modules/value_boxes[value_boxes_server],
     lib/database[
         db_get_species_matched,
         db_get_timeline_data,
-        db_get_observation_data
-    ],
-    lib/species_helpers[compute_default_species]
+        db_get_observation_data,
+        db_get_season_data,
+        db_get_species_summary
+    ]
 )
 
 #' @export
@@ -35,10 +37,21 @@ server <- function(input, output, session, con) {
         db_get_observation_data(con, specimen)
     })
 
-    # Render modules
-    plot_timeline_server(
-        id = "plot_timeline",
-        data = timeline_data,
+    season_data <- reactive({
+        specimen <- selected_scientific()
+        req(specimen)
+        db_get_season_data(con, specimen)
+    })
+
+    species_summary <- reactive({
+        specimen <- selected_scientific()
+        req(specimen)
+        db_get_species_summary(con, specimen)
+    })
+
+    value_boxes_server(
+        id = "value_boxes",
+        data = species_summary,
         species = selected_scientific
     )
 
@@ -47,9 +60,15 @@ server <- function(input, output, session, con) {
         data = timeline_data
     )
 
-    plot_map_server(
-        id = "map_poland",
+    plot_leaflet_map_server(
+        id = "leaflet_map",
         data = observation_data,
+        species = selected_scientific
+    )
+
+    plot_season_server(
+        id = "plot_season",
+        data = season_data,
         species = selected_scientific
     )
 }

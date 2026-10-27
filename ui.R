@@ -8,9 +8,10 @@ box::use(
 )
 box::use(
     modules/select_species[select_species_ui],
-    modules/plot_map[plot_map_ui],
-    modules/plot_timeline[plot_timeline_ui],
-    modules/table_timeline[table_timeline_ui]
+    modules/plot_leaflet_map[plot_leaflet_map_ui],
+    modules/table_timeline[table_timeline_ui],
+    modules/plot_season[plot_season_ui],
+    modules/value_boxes[value_boxes_ui]
 )
 
 #' @export
@@ -21,15 +22,15 @@ ui <- page_sidebar(
         select_species_ui("species_selector")
     ),
 
+    value_boxes_ui("value_boxes"),
     layout_columns(
-        col_widths = 12,
         min_height = "50vh",
-        plot_map_ui("map_poland")
+        plot_leaflet_map_ui("leaflet_map")
     ),
     layout_columns(
         col_widths = c(7, 5),
         min_height = "40vh",
-        plot_timeline_ui("plot_timeline"),
+        plot_season_ui("plot_season"),
         table_timeline_ui("table_yearly")
     )
 )
