@@ -23,13 +23,9 @@ box::use(
 )
 box::use(
     modules/theme[
-        SEASON_COLORS
+        SEASON_TINTS
     ]
 )
-
-# Light tints of the season colours (40% strength on the white card) keep the text easy to read
-SEASON_TINTS <- setNames(adjustcolor(SEASON_COLORS, alpha.f = 0.4), names(SEASON_COLORS))
-
 #' @export
 table_timeline_ui <- function(id) {
     ns <- NS(id)
