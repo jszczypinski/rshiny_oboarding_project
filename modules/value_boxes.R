@@ -3,6 +3,9 @@ box::use(
         layout_columns,
         value_box
     ],
+    dplyr[
+        coalesce
+    ],
     fontawesome[
         fa
     ],
@@ -134,9 +137,7 @@ value_boxes_server <- function(id, data, species) {
 #' @param kingdom Kingdom name (e.g. "Animalia", "Plantae"), may be `NA`.
 #' @return A fontawesome icon.
 .get_kingdom_icon <- function(kingdom) {
-    if (is.na(kingdom)) {
-        return(fa("circle-question", height = ICON_HEIGHT, title = "Unknown kingdom"))
-    }
+    kingdom <- coalesce(kingdom, "Unknown kingdom")
     switch(
         kingdom,
         Animalia = fa("paw", height = ICON_HEIGHT, title = "Animal"),
