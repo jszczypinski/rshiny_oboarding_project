@@ -83,9 +83,10 @@ plot_leaflet_map_server <- function(id, data, species) {
             popups <- pmap_chr(
                 list(
                     date = format(df$eventDate),
-                    season = coalesce(df$season, "unknown"),
+                    # to be sure that season and locality are not factors
+                    season = coalesce(as.character(df$season), "unknown"),
                     count = individuals,
-                    locality = coalesce(df$locality, "unknown")
+                    locality = coalesce(as.character(df$locality), "unknown")
                 ),
                 function(date, season, count, locality) {
                     as.character(doRenderTags(tagList(
