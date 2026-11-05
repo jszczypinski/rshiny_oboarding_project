@@ -42,7 +42,6 @@ table_timeline_ui <- function(id) {
 #' @param data Reactive expression returning occurrence data with `eventDate`
 #'   and `individualCount` columns.
 #'
-#' @return Registers the module server logic.
 #' @export
 table_timeline_server <- function(id, data) {
     moduleServer(id, function(input, output, session) {

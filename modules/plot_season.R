@@ -55,7 +55,6 @@ plot_season_ui <- function(id) {
 #'   and `individualCount` columns.
 #' @param species Reactive expression returning the selected species name.
 #'
-#' @return Registers the module server logic.
 #' @export
 plot_season_server <- function(id, data, species) {
     moduleServer(id, function(input, output, session) {

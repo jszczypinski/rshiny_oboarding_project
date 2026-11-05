@@ -67,7 +67,7 @@ value_boxes_ui <- function(id) {
             value_box(
                 title = NULL,
                 value = uiOutput(ns("names")),
-                showcase = uiOutput(ns(".get_kingdom_icon")),
+                showcase = uiOutput(ns("get_kingdom_icon")),
                 class = "value-box-compact"
             ),
             value_box(
@@ -92,15 +92,14 @@ value_boxes_ui <- function(id) {
 #'   `vernacularName`, `records` and `individuals` columns.
 #' @param species Reactive expression returning the selected scientific name.
 #'
-#' @return Registers the module server logic.
 #' @export
 value_boxes_server <- function(id, data, species) {
     moduleServer(id, function(input, output, session) {
-        output$.get_kingdom_icon <- renderUI({
+        output$get_kingdom_icon <- renderUI({
             kingdom <- data()$kingdom
             req(length(kingdom) == 1)
 
-            .get_kingdom_icon(kingdom)
+            get_kingdom_icon(kingdom)
         })
 
         output$names <- renderUI({
@@ -136,7 +135,7 @@ value_boxes_server <- function(id, data, species) {
 #'
 #' @param kingdom Kingdom name (e.g. "Animalia", "Plantae"), may be `NA`.
 #' @return A fontawesome icon.
-.get_kingdom_icon <- function(kingdom) {
+get_kingdom_icon <- function(kingdom) {
     kingdom <- coalesce(kingdom, "Unknown kingdom")
     switch(
         kingdom,

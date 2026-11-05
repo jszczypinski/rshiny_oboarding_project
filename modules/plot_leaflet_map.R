@@ -71,7 +71,6 @@ plot_leaflet_map_ui <- function(id) {
 #'   `eventDate`, `individualCount`, `season` and `locality` columns.
 #' @param species Reactive expression returning the selected species name.
 #'
-#' @return Registers the module server logic.
 #' @export
 plot_leaflet_map_server <- function(id, data, species) {
     moduleServer(id, function(input, output, session) {
