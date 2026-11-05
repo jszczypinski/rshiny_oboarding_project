@@ -89,14 +89,22 @@ plot_leaflet_map_server <- function(id, data, species) {
                 ),
                 function(date, season, count, locality) {
                     tagList(
-                        tags$b(species()), tags$br(),
-                        "Date: ", date, tags$br(),
-                        "Season: ", season, tags$br(),
-                        "Individuals: ", count, tags$br(),
-                        "Locality: ", locality
+                        tags$b(species()),
+                        tags$br(),
+                        "Date: ",
+                        date,
+                        tags$br(),
+                        "Season: ",
+                        season,
+                        tags$br(),
+                        "Individuals: ",
+                        count,
+                        tags$br(),
+                        "Locality: ",
+                        locality
                     ) |>
-                      doRenderTags() |>
-                      as.character()
+                        doRenderTags() |>
+                        as.character()
                 }
             )
 
