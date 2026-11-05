@@ -89,21 +89,15 @@ plot_leaflet_map_server <- function(id, data, species) {
                     locality = coalesce(as.character(df$locality), "unknown")
                 ),
                 function(date, season, count, locality) {
-                    as.character(doRenderTags(tagList(
-                        tags$b(species()),
-                        tags$br(),
-                        "Date: ",
-                        date,
-                        tags$br(),
-                        "Season: ",
-                        season,
-                        tags$br(),
-                        "Individuals: ",
-                        count,
-                        tags$br(),
-                        "Locality: ",
-                        locality
-                    )))
+                    tagList(
+                        tags$b(species()), tags$br(),
+                        "Date: ", date, tags$br(),
+                        "Season: ", season, tags$br(),
+                        "Individuals: ", count, tags$br(),
+                        "Locality: ", locality
+                    ) |>
+                      doRenderTags() |>
+                      as.character()
                 }
             )
 
