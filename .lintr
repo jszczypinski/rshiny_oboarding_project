@@ -1,7 +1,8 @@
 linters: linters_with_defaults(
     line_length_linter(120),
     indentation_linter(indent = 4L),
-    object_usage_linter = NULL
+    object_usage_linter = NULL,
+    object_name_linter(styles = c("snake_case", "symbols", "SNAKE_CASE"))
     )
 exclusions: list("renv", "data")
 encoding: "UTF-8"

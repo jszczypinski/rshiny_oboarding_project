@@ -35,7 +35,7 @@ opt <- parse_args(opt_parser)
 
 if (is.null(opt$input)) {
     print_help(opt_parser)
-    stop("You must provide --input <path-to-csv>", call = .FALSE)
+    stop("You must provide --input <path-to-csv>", call. = FALSE)
 }
 
 input_csv <- opt$input
@@ -48,15 +48,22 @@ con <- dbConnect(
     read_only = FALSE
 )
 
-# Filter data from Poland only with observed eventDate, scientificName and geo data
-# Will add vernacularName in the future
+# Filter data from Poland only with observed eventDate, geo data and at least one species name
+# Records without a scientific name get a placeholder that includes the common name, because the
+# app selects records by scientificName and each such species must stay separate
 DBI::dbExecute(
     con,
     sprintf(
         "
         CREATE OR REPLACE TABLE occurence_poland_base AS
-        SELECT *
-        FROM read_csv('%s')
+        SELECT * REPLACE (
+            COALESCE(scientificName, 'No scientific name provided (' || vernacularName || ')') AS scientificName,
+            CASE
+                WHEN kingdom IS NULL AND scientificName = 'Hylocomium splendens' THEN 'Plantae'
+                ELSE kingdom
+            END AS kingdom
+        )
+        FROM read_csv(%s)
         WHERE (
             LOWER(country) IN ('poland')
             OR countryCode = 'PL'
@@ -64,20 +71,36 @@ DBI::dbExecute(
         AND eventDate IS NOT NULL
         AND latitudeDecimal IS NOT NULL
         AND longitudeDecimal IS NOT NULL
-        AND scientificName IS NOT NULL
+        AND (scientificName IS NOT NULL OR vernacularName IS NOT NULL)
         ",
-        input_csv
+        dbQuoteString(con, input_csv) # quoted so paths with ' don't break the SQL
     )
 )
 
-# Select from observations in Poland only those species for which there is a total of >5 observations
+# Select from observations in Poland only those species for which there is a total of >5 individuals recorded
 # Just to make it run faster for now.
 # Keep only those species in occurence_poland
+# Classify eventDate into astronomical seasons using fixed start dates:
+# spring 21 Mar, summer 21 Jun, autumn 23 Sep, winter 22 Dec
+# Assings
 DBI::dbExecute(
     con,
     "CREATE OR REPLACE TABLE occurence_poland AS
-    SELECT base.*
-    FROM occurence_poland_base AS base
+    SELECT
+        base.* EXCLUDE (month_day),
+        CASE
+            WHEN month_day IS NULL THEN NULL
+            WHEN month_day >= 1222 OR month_day < 321 THEN 'winter'
+            WHEN month_day < 621 THEN 'spring'
+            WHEN month_day < 923 THEN 'summer'
+            ELSE 'autumn'
+        END AS season
+    FROM (
+        SELECT
+            *,
+            month(TRY_CAST(eventDate AS DATE)) * 100 + day(TRY_CAST(eventDate AS DATE)) AS month_day
+        FROM occurence_poland_base
+    ) AS base
     JOIN (
         SELECT scientificName
         FROM occurence_poland_base

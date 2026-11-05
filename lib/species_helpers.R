@@ -14,7 +14,6 @@ compute_default_species <- function(
     vernacular_names,
     preferred_sci = "Haliaeetus albicilla"
 ) {
-    # Default scientific name
     default_sci <-
         if (preferred_sci %in% scientific_names) {
             preferred_sci
@@ -25,7 +24,6 @@ compute_default_species <- function(
         }
 
     if (is.null(default_sci)) {
-        # Fallback if no scientific names at all
         default_vern <-
             if (length(vernacular_names) > 0) {
                 vernacular_names[1]
@@ -35,7 +33,6 @@ compute_default_species <- function(
         return(list(sci = NULL, vern = default_vern))
     }
 
-    # Build lookup
     sci_to_vern <- setNames(vernacular_names, scientific_names)
 
     default_vern <-
