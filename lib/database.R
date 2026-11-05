@@ -113,7 +113,7 @@ db_get_season_data <- function(con, species) {
 #' @return Data frame with kingdom, vernacularName, records and individuals.
 #' @export
 db_get_species_summary <- function(con, species) {
-    summary <- dbGetQuery(
+   dbGetQuery(
         con,
         "
         SELECT
