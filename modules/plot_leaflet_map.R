@@ -108,7 +108,7 @@ plot_leaflet_map_server <- function(id, data, species) {
             )
 
             leaflet(df, options = leafletOptions(zoomSnap = 0.25)) |>
-                # Using light grey basemap because it needs no API key)
+                # Using light grey basemap because it needs no API key
                 addProviderTiles(providers$Esri.WorldGrayCanvas) |>
                 addCircleMarkers(
                     lng = ~ as.numeric(longitude),
