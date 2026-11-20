@@ -1,7 +1,8 @@
 options(box.path = here::here())
 box::use(
     testthat[
-        test_that
+        describe,
+        it
     ]
 )
 
@@ -15,37 +16,37 @@ box::use(
 sci_names <- c("Corvus corax", "Haliaeetus albicilla", "Parus major")
 vern_names <- c("Common Raven", "White-tailed Eagle", "Great Tit")
 
-test_that("compute_default_species returns a list with `sci` and `vern` elements", {
+describe("compute_default_species", {
     species_test <- compute_default_species(sci_names, vern_names)
 
-    expect_type(species_test, "list")
-    expect_named(species_test, c("sci", "vern"))
-})
+    it("returns a list with `sci` and `vern` elements", {
+        expect_type(species_test, "list")
+        expect_named(species_test, c("sci", "vern"))
+    })
 
-test_that("compute_default_species choose the preferred specimen when it is present", {
-    species_test <- compute_default_species(sci_names, vern_names)
+    it("chooses the preferred species when it is present", {
+        expect_equal(species_test$sci, "Haliaeetus albicilla")
+        expect_equal(species_test$vern, "White-tailed Eagle")
+    })
 
-    expect_equal(species_test$sci, "Haliaeetus albicilla")
-    expect_equal(species_test$vern, "White-tailed Eagle")
-})
+    it("falls back to the first species when the preferred one is missing", {
+        fallback_test <- compute_default_species(sci_names, vern_names, preferred_sci = "Abstractus polacus")
 
-test_that("compute_default_species falls back to the first species when the preferred one is missing", {
-    species_test <- compute_default_species(sci_names, vern_names, preferred_sci = "Abstractus polacus")
+        expect_equal(fallback_test$sci, "Corvus corax")
+        expect_equal(fallback_test$vern, "Common Raven")
+    })
 
-    expect_equal(species_test$sci, "Corvus corax")
-    expect_equal(species_test$vern, "Common Raven")
-})
+    it("returns the first vernacular name when there are no scientific names", {
+        no_sci_test <- compute_default_species(character(0), vern_names)
 
-test_that("compute_default_species returns the first vernacular name when there are no scientific names", {
-    species_test <- compute_default_species(character(0), vern_names)
+        expect_null(no_sci_test$sci)
+        expect_equal(no_sci_test$vern, "Common Raven")
+    })
 
-    expect_null(species_test$sci)
-    expect_equal(species_test$vern, "Common Raven")
-})
-
-test_that("compute_default_species keeps both elements as NULL when there are no names at all", {
-    species_test <- compute_default_species(character(0), character(0))
-    # returns NULL so an empty database shows the placeholder instead of crashing the app at startup".
-    expect_null(species_test$sci)
-    expect_null(species_test$vern)
+    it("keeps both elements as NULL when there are no names at all", {
+        empty_test <- compute_default_species(character(0), character(0))
+        # returns NULL so an empty database shows the placeholder instead of crashing the app at startup
+        expect_null(empty_test$sci)
+        expect_null(empty_test$vern)
+    })
 })
