@@ -53,10 +53,9 @@ plot_season_ui <- function(id) {
 #' @param id Shiny module ID.
 #' @param data Reactive expression returning a data frame with `season`
 #'   and `individualCount` columns.
-#' @param species Reactive expression returning the selected species name.
 #'
 #' @export
-plot_season_server <- function(id, data, species) {
+plot_season_server <- function(id, data) {
     moduleServer(id, function(input, output, session) {
         output$plot <- renderPlot({
             df <- data()

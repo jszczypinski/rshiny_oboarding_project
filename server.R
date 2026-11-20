@@ -68,7 +68,6 @@ server <- function(input, output, session, con) {
 
     plot_season_server(
         id = "plot_season",
-        data = season_data,
-        species = selected_scientific
+        data = season_data
     )
 }
